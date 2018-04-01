@@ -1,0 +1,34 @@
+---
+ - name: UPGRADE PACKAGES
+   apt:
+        upgrade: yes
+
+ - name: INSTALL PACKAGES
+   apt:
+        name: "{{ item }}"	
+        state: latest
+   with_items:	
+        - ca-certificates
+        - curl
+        - openssh-server
+
+ - name: INSTALL GITLAB SCRIPT
+   shell: curl -LO https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh
+   args:
+        chdir: /tmp
+
+ - name: BASH SCRIPT
+   shell:  bash /tmp/script.deb.sh
+
+ - name: INSTALL GIT LAB 
+   apt:    
+        name: gitlab-ce
+        state: latest	
+
+ - name: TEMPLATE GITLAB.RB.J2
+   template:
+        src: /root/gitlab/gitlab/templates/gitlab.rb.j2
+        dest: /etc/gitlab/gitlab.rb
+
+ - name: FINAL INSTALLAION
+   shell: gitlab-ctl reconfigure
